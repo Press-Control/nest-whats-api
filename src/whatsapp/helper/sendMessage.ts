@@ -8,8 +8,11 @@ export const sendMessageApi = async (
 ) => {
   const clean_data = await cleanData(client, number);
   if (clean_data['ok']) {
-    await client.sendMessage(`521${clean_data['number']}@c.us`, message);
-    console.log('Client send');
+    const sendMessageTxt = await client.sendMessage(
+      `521${clean_data['number']}@c.us`,
+      message,
+    );
+    console.log(sendMessageTxt);
     const respuesta = {
       ok: true,
       msg: 'Mensaje envido',

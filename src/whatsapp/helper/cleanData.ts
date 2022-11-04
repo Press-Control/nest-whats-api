@@ -11,9 +11,17 @@ export const validNumber = async (client: Client, phoneNumber: number) => {
   }
 };
 
-export const cleanData = async (client: Client, phoneNumber: number) => {
+export const cleanData = async (client: Client, myphoneNumber: any) => {
   try {
     // phoneNumber = phoneNumber.replace(/\s+/g, '');
+    const phoneNumber: number = parseInt(myphoneNumber);
+    if (phoneNumber.toString().length != 10) {
+      return {
+        ok: false,
+        msg: `Este numero ${phoneNumber} no tiene el formato permitido`,
+        status: 404,
+      };
+    }
     const valid_number = await validNumber(client, phoneNumber);
     if (valid_number) {
       return {

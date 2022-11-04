@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'whatsapp-web.js';
-import * as qrcode from 'qrcode-terminal';
-import { sendFileApi, sendMessageApi } from './helper/sendMessage';
+import { MessageMediaDto } from './dto/message-media.dto';
+import { MessageTxtDto } from './dto/message-txt.dto';
 import * as fs from 'fs';
 import * as qr_svg_api from 'qr-image';
+import * as qrcode from 'qrcode-terminal';
+import { sendFileApi, sendMessageApi } from './helper/sendMessage';
 
 @Injectable()
-export class AppService extends Client {
+export class WhatsappService extends Client {
   status = false;
   constructor() {
     super({
@@ -27,12 +29,24 @@ export class AppService extends Client {
     this.on('qr', (qr) => {
       qrcode.generate(qr, { small: true });
       const qr_svg = qr_svg_api.image(qr, { type: 'svg' });
-      qr_svg.pipe(fs.createWriteStream(`${__dirname}/../public/qr-code.svg`));
+      qr_svg.pipe(
+        fs.createWriteStream(`${__dirname}/../../public/qr-code.svg`),
+      );
     });
 
     this.on('ready', () => {
       this.status = true;
       console.log('Cliente Listo');
+    });
+
+    this.on('message_reaction', (reaction) => {
+      console.log(reaction);
+    });
+
+    this.on('message', (message) => {
+      console.log(message);
+
+      console.log(message.body);
     });
 
     this.on('disconnected', async (msg) => {
@@ -41,15 +55,32 @@ export class AppService extends Client {
     this.initialize();
   }
 
-  async sendTxt(phoneNumber: number, message: string) {
+  async createMessageTxt(messageTxtDto: MessageTxtDto) {
+    const phoneNumber = parseInt(messageTxtDto.phoneNumber);
+    const message = messageTxtDto.message;
+
     const send = await sendMessageApi(this, phoneNumber, message);
     console.log(send['status']);
     return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
 
-  async sendFile(phoneNumber: number, path: string) {
+  async createMessageMedia(messageMediaDto: MessageMediaDto) {
+    const phoneNumber = parseInt(messageMediaDto.phoneNumber);
+    const path = messageMediaDto.path;
+
     const send = await sendFileApi(this, phoneNumber, path);
-    console.log(send['status']);
     return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
+
+  // create(createWhatsappDto: MessageTxtDto) {
+  //   return 'This action adds a new whatsapp';
+  // }
+
+  // findAll() {
+  //   return `This action returns all whatsapp`;
+  // }
+
+  // findOne(id: number) {
+  //   return `This action returns a #${id} whatsapp`;
+  // }
 }
