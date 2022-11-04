@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'whatsapp-web.js';
 import * as qrcode from 'qrcode-terminal';
-import { sendMessageApi } from './helper/sendMessage';
+import { sendFileApi, sendMessageApi } from './helper/sendMessage';
+import * as fs from 'fs';
+import * as qr_svg_api from 'qr-image';
 
 @Injectable()
 export class AppService extends Client {
-  private status = false;
+  status = false;
   constructor() {
     super({
       puppeteer: {
@@ -23,10 +25,9 @@ export class AppService extends Client {
     });
 
     this.on('qr', (qr) => {
-      console.log('Escanea el codigo QR que esta en la carepta tmp');
-      // TODO: generar imagen
-      console.log(qr);
       qrcode.generate(qr, { small: true });
+      const qr_svg = qr_svg_api.image(qr, { type: 'svg' });
+      qr_svg.pipe(fs.createWriteStream(`${__dirname}/../public/qr-code.svg`));
     });
 
     this.on('ready', () => {
@@ -46,7 +47,9 @@ export class AppService extends Client {
     return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
 
-  getHello(): string {
-    return 'Hello World!';
+  async sendFile(phoneNumber: number, path: string) {
+    const send = await sendFileApi(this, phoneNumber, path);
+    console.log(send['status']);
+    return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
 }
