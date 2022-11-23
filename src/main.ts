@@ -27,7 +27,7 @@ async function bootstrap() {
       showRequestDuration: true,
     },
   });
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.ESCLAVOPORT);
 }
 
 bootstrap();
