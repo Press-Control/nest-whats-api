@@ -18,7 +18,8 @@ export class WhatsappService extends Client {
         // Si se ejecuta en Macos el path es el siguiente
         // executablePath: '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
         executablePath:
-          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
         args: ['--no-sandbox'],
       },
     });
@@ -39,14 +40,19 @@ export class WhatsappService extends Client {
       console.log('Cliente Listo');
     });
 
-    this.on('message_reaction', (reaction) => {
-      console.log(reaction);
-    });
+    // this.on('message_reaction', (reaction) => {
+    //   console.log(reaction);
+    // });
 
     this.on('message', (message) => {
-      console.log(message);
+      // Todo Guradar mensaje en la base de datos
+      if (message.from === 'status@broadcast') {
+        return
+    }
 
       console.log(message.body);
+      console.log(message.from);
+      
     });
 
     this.on('disconnected', async (msg) => {

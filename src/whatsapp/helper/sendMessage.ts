@@ -1,15 +1,15 @@
 import { Client, MessageMedia } from 'whatsapp-web.js';
-import { cleanData } from './cleanData';
+import { validNumber } from './validNumber';
 
 export const sendMessageApi = async (
   client: Client,
   number: number,
   message: string,
 ) => {
-  const clean_data = await cleanData(client, number);
-  if (clean_data['ok']) {
+  const _validNumber = await validNumber(client, number);
+  if (_validNumber) {
     const sendMessageTxt = await client.sendMessage(
-      `521${clean_data['number']}@c.us`,
+      `521${number}@c.us`,
       message,
     );
     console.log(sendMessageTxt);
@@ -20,7 +20,12 @@ export const sendMessageApi = async (
     };
     return respuesta;
   } else {
-    return clean_data;
+    const respuesta = {
+      ok: false,
+      msg: 'El número no es un usuario válido de whatsapp',
+      status: 404,
+    };
+    return respuesta;
   }
 };
 
@@ -29,12 +34,12 @@ export const sendFileApi = async (
   number: number,
   path: string,
 ) => {
-  const clean_data = await cleanData(client, number);
-  if (clean_data['ok']) {
+  const _validNumber = await validNumber(client, number);
+  if (_validNumber) {
     const file = path;
     try {
       const media = MessageMedia.fromFilePath(file);
-      await client.sendMessage(`521${clean_data['number']}@c.us`, media);
+      await client.sendMessage(`521${number}@c.us`, media);
       console.log('Client send');
       const respuesta = {
         ok: true,
@@ -52,6 +57,11 @@ export const sendFileApi = async (
       return respuesta;
     }
   } else {
-    return clean_data;
+    const respuesta = {
+      ok: false,
+      msg: 'El número no es un usuario de whatsapp válido',
+      status: 404,
+    };
+    return respuesta;
   }
 };
