@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as qr_svg_api from 'qr-image';
 import * as qrcode from 'qrcode-terminal';
 import { sendFileApi, sendMessageApi } from './helper/sendMessage';
+import axios from 'axios';
 
 @Injectable()
 export class WhatsappService extends Client {
@@ -23,21 +24,24 @@ export class WhatsappService extends Client {
         args: ['--no-sandbox'],
       },
     });
-    this.on('loading_screen', (percent, message) => {
+    this.on('loading_screen', async (percent, message) => {
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen" });
       console.log('Cargando pantalla', percent, message);
     });
 
-    this.on('qr', (qr) => {
+    this.on('qr', async (qr) => {
       qrcode.generate(qr, { small: true });
       const qr_svg = qr_svg_api.image(qr, { type: 'svg' });
       qr_svg.pipe(
         fs.createWriteStream(`${__dirname}/../../public/qr-code.svg`),
       );
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "qr" });
     });
 
-    this.on('ready', () => {
+    this.on('ready', async () => {
       this.status = true;
       console.log('Cliente Listo');
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "ready" });
     });
 
     // this.on('message_reaction', (reaction) => {
@@ -57,6 +61,7 @@ export class WhatsappService extends Client {
 
     this.on('disconnected', async (msg) => {
       console.log('Cliente desconectado', msg);
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "disconnected" });
     });
     this.initialize();
   }
