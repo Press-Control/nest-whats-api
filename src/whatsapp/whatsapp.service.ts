@@ -25,7 +25,7 @@ export class WhatsappService extends Client {
       },
     });
     this.on('loading_screen', async (percent, message) => {
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen" });
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen", updatedAt: Date.now() });
       console.log('Cargando pantalla', percent, message);
     });
 
@@ -35,13 +35,13 @@ export class WhatsappService extends Client {
       qr_svg.pipe(
         fs.createWriteStream(`${__dirname}/../../public/qr-code.svg`),
       );
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "qr" });
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "qr", updatedAt: Date.now() });
     });
 
     this.on('ready', async () => {
       this.status = true;
       console.log('Cliente Listo');
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "ready" });
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "ready", updatedAt: Date.now()});
     });
 
     // this.on('message_reaction', (reaction) => {
@@ -61,7 +61,7 @@ export class WhatsappService extends Client {
 
     this.on('disconnected', async (msg) => {
       console.log('Cliente desconectado', msg);
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "disconnected" });
+      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "disconnected", port: null, pm2_name: null, updatedAt: Date.now()});
     });
     this.initialize();
   }
