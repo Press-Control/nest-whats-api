@@ -61,7 +61,7 @@ export class WhatsappService extends Client {
 
     this.on('disconnected', async (msg) => {
       console.log('Cliente desconectado', msg);
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "disconnected", port: null, pm2_name: null, updatedAt: Date.now()});
+      await axios.delete(`http://localhost:3000/api/messenger/${process.env.USERID}`);
     });
     this.initialize();
   }
