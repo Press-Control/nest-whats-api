@@ -7,6 +7,7 @@ import * as qr_svg_api from 'qr-image';
 import * as qrcode from 'qrcode-terminal';
 import { sendFileApi, sendMessageApi } from './helper/sendMessage';
 import axios from 'axios';
+import { connectToServer } from './socket-client';
 
 @Injectable()
 export class WhatsappService extends Client {
@@ -42,6 +43,7 @@ export class WhatsappService extends Client {
       this.status = true;
       console.log('Cliente Listo');
       await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "ready", updatedAt: Date.now()});
+      connectToServer();
     });
 
     // this.on('message_reaction', (reaction) => {
