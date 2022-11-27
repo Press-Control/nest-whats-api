@@ -6,8 +6,15 @@ import * as fs from 'fs';
 import * as qr_svg_api from 'qr-image';
 import * as qrcode from 'qrcode-terminal';
 import { sendFileApi, sendMessageApi } from './helper/sendMessage';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { connectToServer } from './socket-client';
+import * as phone from 'google-libphonenumber';
+import * as fsPromise from 'fs/promises';
+
+interface MessengerCreateResponse {
+  ok: boolean;
+  msg: string;
+}
 
 @Injectable()
 export class WhatsappService extends Client {
@@ -20,13 +27,13 @@ export class WhatsappService extends Client {
         // Si se ejecuta en Macos el path es el siguiente
         // executablePath: '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
         executablePath:
-        //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-        '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
+          //   '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
+          '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
         args: ['--no-sandbox'],
       },
     });
     this.on('loading_screen', async (percent, message) => {
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen", updatedAt: Date.now() });
+      // await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen", updatedAt: Date.now() });
       console.log('Cargando pantalla', percent, message);
     });
 
@@ -36,15 +43,39 @@ export class WhatsappService extends Client {
       qr_svg.pipe(
         fs.createWriteStream(`${__dirname}/../../public/qr-code.svg`),
       );
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "qr", updatedAt: Date.now() });
+      // await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "qr", updatedAt: Date.now() });
     });
 
     this.on('ready', async () => {
-      console.log(this.info.wid.user);
-      this.status = true;
-      console.log('Cliente Listo');
-      await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "ready", updatedAt: Date.now()});
-      connectToServer();
+      try {
+        console.log(this.info.wid.user);
+        // Implementar el metodo google phone para extraer el numero del usuario
+        const phoneUtil = phone.PhoneNumberUtil.getInstance();
+        const _userPhone = phoneUtil.parseAndKeepRawInput(
+          this.info.wid.user,
+          'MX',
+        );
+        const _myPhone = phoneUtil.getNationalSignificantNumber(_userPhone);
+        console.log(_myPhone);
+        this.status = true;
+        console.log('Cliente Listo');
+        // TODO: GUARDAR EN LA VARIABLE DE ENTORNO LA RESPUESTA DE userId
+        const userId: AxiosResponse<MessengerCreateResponse> = await axios.post(
+          `${process.env.MAIN_URL}${process.env.CREATE_MESSENGER_URL}`,
+          { phone: _myPhone, botProcessId: process.env.BOT_PROCESS_ID },
+        );
+        await fsPromise.appendFile(
+          `${__dirname}/../../.env`,
+          `\n${'messengerId'.toUpperCase()}=${userId.data.msg}`,
+        );
+        await axios.patch(
+          `${process.env.MAIN_URL}${process.env.UPDATE_BOT_PROCESS_URL}/${process.env.BOT_PROCESS_ID}`,
+          { status: 'ready', updatedAt: Date.now() },
+        );
+        connectToServer();
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     // this.on('message_reaction', (reaction) => {
@@ -52,19 +83,18 @@ export class WhatsappService extends Client {
     // });
 
     this.on('message', (message) => {
-      // Todo Guradar mensaje en la base de datos
+      // TODO: Guradar mensaje en la base de datos
       if (message.from === 'status@broadcast') {
-        return
-    }
+        return;
+      }
 
       console.log(message.body);
       console.log(message.from);
-      
     });
 
     this.on('disconnected', async (msg) => {
       console.log('Cliente desconectado', msg);
-      await axios.delete(`http://localhost:3000/api/messenger/removepm2/${process.env.USERID}`);
+      // await axios.delete(`${process.env.MAIN_URL}/api/messenger/removepm2/${process.env.USERID}`);
     });
     this.initialize();
   }
