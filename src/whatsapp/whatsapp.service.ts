@@ -34,6 +34,7 @@ export class WhatsappService extends Client {
     });
     this.on('loading_screen', async (percent, message) => {
       // await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen", updatedAt: Date.now() });
+      await axios.patch(`${process.env.MAIN_URL}/api/botprocess/${process.env.BOT_PROCESS_ID}`, {status: "loading_screen", updatedAt: Date.now()});
       console.log('Cargando pantalla', percent, message);
     });
 
@@ -43,7 +44,7 @@ export class WhatsappService extends Client {
       qr_svg.pipe(
         fs.createWriteStream(`${__dirname}/../../public/qr-code.svg`),
       );
-      // await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "qr", updatedAt: Date.now() });
+      await axios.patch(`${process.env.MAIN_URL}/api/botprocess/${process.env.BOT_PROCESS_ID}`, {status: "qr", updatedAt: Date.now()});
     });
 
     this.on('ready', async () => {
@@ -94,7 +95,7 @@ export class WhatsappService extends Client {
 
     this.on('disconnected', async (msg) => {
       console.log('Cliente desconectado', msg);
-      // await axios.delete(`${process.env.MAIN_URL}/api/messenger/removepm2/${process.env.USERID}`);
+      await axios.delete(`${process.env.MAIN_URL}/api/botprocess/removepm2/${process.env.BOT_PROCESS_ID}`);
     });
     this.initialize();
   }
