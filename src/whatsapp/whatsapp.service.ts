@@ -40,6 +40,7 @@ export class WhatsappService extends Client {
     });
 
     this.on('ready', async () => {
+      console.log(this.info.wid.user);
       this.status = true;
       console.log('Cliente Listo');
       await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "ready", updatedAt: Date.now()});
