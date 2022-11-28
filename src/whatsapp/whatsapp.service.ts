@@ -90,9 +90,10 @@ export class WhatsappService extends Client {
       }
       const _send = message;
       console.log('---------------Message------------------');
-      console.log(message);
+      // console.log(_send);
+      // console.log(_send.from.split('@')[0]);
       console.log('---------------Message------------------');
-      const userId = await axios.get(
+      const userId:AxiosResponse<MessengerCreateResponse> = await axios.get(
         `${process.env.MAIN_URL}/api/user/botmessage/${
           _send.from.split('@')[0]
         }`,
@@ -101,14 +102,20 @@ export class WhatsappService extends Client {
       const messageDB = {
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        from: await userId.data.msg,
+        from: userId.data.msg,
         to: process.env.MESSENGERID,
         hasMedia: _send.hasMedia,
         type: _send.type,
         body: _send.body,
         whatsData: _send
       };
-      const _createMessage = axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+      console.log(messageDB);
+      try {
+        const _createMessage = axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+      } catch (error) {
+        console.log(error);
+      }
+      
     });
 
     this.on('disconnected', async (msg) => {
