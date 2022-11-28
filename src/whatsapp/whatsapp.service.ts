@@ -67,7 +67,7 @@ export class WhatsappService extends Client {
         );
         await fsPromise.appendFile(
           `${__dirname}/../../.env`,
-          `\n${'messengerId'.toUpperCase()}=${userId.data.msg}`,
+          `MESSENGERID=${userId.data.msg}`,
         );
         await axios.patch(
           `${process.env.MAIN_URL}${process.env.UPDATE_BOT_PROCESS_URL}/${process.env.BOT_PROCESS_ID}`,
@@ -98,6 +98,8 @@ export class WhatsappService extends Client {
           _send.from.split('@')[0]
         }`,
       );
+      console.log(_send.to.split('@')[0]);
+      
 
       const _messengerId:AxiosResponse<MessengerCreateResponse> = await axios.get(
         `${process.env.MAIN_URL}/api/messenger/${
