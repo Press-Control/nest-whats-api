@@ -28,13 +28,15 @@ export class WhatsappService extends Client {
         // executablePath: '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
         executablePath:
           //   '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
-          '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
+          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         args: ['--no-sandbox'],
       },
     });
     this.on('loading_screen', async (percent, message) => {
-      // await axios.patch(`http://localhost:3000/api/messenger/${process.env.USERID}`, { status: "loading_screen", updatedAt: Date.now() });
-      await axios.patch(`${process.env.MAIN_URL}/api/botprocess/${process.env.BOT_PROCESS_ID}`, {status: "loading_screen", updatedAt: Date.now()});
+      await axios.patch(
+        `${process.env.MAIN_URL}/api/botprocess/${process.env.BOT_PROCESS_ID}`,
+        { status: 'loading_screen' },
+      );
       console.log('Cargando pantalla', percent, message);
     });
 
@@ -44,7 +46,10 @@ export class WhatsappService extends Client {
       qr_svg.pipe(
         fs.createWriteStream(`${__dirname}/../../public/qr-code.svg`),
       );
-      await axios.patch(`${process.env.MAIN_URL}/api/botprocess/${process.env.BOT_PROCESS_ID}`, {status: "qr", updatedAt: Date.now()});
+      await axios.patch(
+        `${process.env.MAIN_URL}/api/botprocess/${process.env.BOT_PROCESS_ID}`,
+        { status: 'qr' },
+      );
     });
 
     this.on('ready', async () => {
@@ -71,7 +76,7 @@ export class WhatsappService extends Client {
         );
         await axios.patch(
           `${process.env.MAIN_URL}${process.env.UPDATE_BOT_PROCESS_URL}/${process.env.BOT_PROCESS_ID}`,
-          { status: 'ready', updatedAt: Date.now() },
+          { status: 'ready' },
         );
         connectToServer();
       } catch (error) {
@@ -93,50 +98,58 @@ export class WhatsappService extends Client {
       // console.log(_send);
       // console.log(_send.from.split('@')[0]);
       console.log('---------------Message------------------');
-      const userId:AxiosResponse<MessengerCreateResponse> = await axios.get(
+      const userId: AxiosResponse<MessengerCreateResponse> = await axios.get(
         `${process.env.MAIN_URL}/api/user/botmessage/${
           _send.from.split('@')[0]
         }`,
       );
       console.log(_send.to.split('@')[0]);
-      
 
-      const _messengerId:AxiosResponse<MessengerCreateResponse> = await axios.get(
-        `${process.env.MAIN_URL}/api/messenger/${
-          _send.to.split('@')[0]
-        }`,
-      );
+      const _messengerId: AxiosResponse<MessengerCreateResponse> =
+        await axios.get(
+          `${process.env.MAIN_URL}/api/messenger/${_send.to.split('@')[0]}`,
+        );
 
       console.log(userId);
-      console.log('----------------------------messengerid-----------------------------');
+      console.log(
+        '----------------------------messengerid-----------------------------',
+      );
       console.log(process.env.MESSENGERID);
-      console.log('----------------------------messengerid-----------------------------');
-      
+      console.log(
+        '----------------------------messengerid-----------------------------',
+      );
+
       const messageDB = {
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
         from: userId.data.msg,
         to: _messengerId.data.msg,
         hasMedia: _send.hasMedia,
         type: _send.type,
         sendFromBot: false,
         body: _send.body,
-        whatsData: _send
+        whatsData: _send,
       };
-      console.log('----------------------------messengerdbobject-----------------------------');
+      console.log(
+        '----------------------------messengerdbobject-----------------------------',
+      );
       console.log(messageDB);
-      console.log('----------------------------messengerdbobject-----------------------------');
+      console.log(
+        '----------------------------messengerdbobject-----------------------------',
+      );
       try {
-        const _createMessage = await axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+        const _createMessage = await axios.post(
+          `${process.env.MAIN_URL}/api/message/`,
+          messageDB,
+        );
       } catch (error) {
         console.log(error);
       }
-      
     });
 
     this.on('disconnected', async (msg) => {
       console.log('Cliente desconectado', msg);
-      await axios.delete(`${process.env.MAIN_URL}/api/botprocess/removepm2/${process.env.BOT_PROCESS_ID}`);
+      await axios.delete(
+        `${process.env.MAIN_URL}/api/botprocess/removepm2/${process.env.BOT_PROCESS_ID}`,
+      );
     });
     this.initialize();
   }
@@ -146,9 +159,13 @@ export class WhatsappService extends Client {
     const message = messageTxtDto.message;
 
     const send = await sendMessageApi(this, phoneNumber, message);
-    console.log('--------------------------------SendMessageText----------------------------------');
+    console.log(
+      '--------------------------------SendMessageText----------------------------------',
+    );
     console.log(send['status']);
-    console.log('--------------------------------SendMessageText----------------------------------');
+    console.log(
+      '--------------------------------SendMessageText----------------------------------',
+    );
     return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
 

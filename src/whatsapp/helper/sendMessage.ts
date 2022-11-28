@@ -28,8 +28,6 @@ export const sendMessageApi = async (
       }`,
     );
     const messageDB = {
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
       from: _messengerId.data.msg,
       to: await userId.data.msg,
       hasMedia: _send.hasMedia,
@@ -79,8 +77,6 @@ export const sendFileApi = async (
         }`,
       );
       const messageDB = {
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
         from: _messengerId.data.msg,
         to: await userId.data.msg,
         hasMedia: _send.hasMedia,
