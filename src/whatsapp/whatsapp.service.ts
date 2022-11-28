@@ -155,10 +155,12 @@ export class WhatsappService extends Client {
       const _messengerId = await axios.get(
         `${process.env.MAIN_URL}/api/messenger/${_myPhone}`,
       );
-      console.log('Cliente desconectado', msg);
+      console.log(_messengerId.data.user.botProcessId);
+      
       await axios.delete(
-        `${process.env.MAIN_URL}/api/botprocess/removepm2/${_messengerId.data.msg}`,
+        `${process.env.MAIN_URL}/api/botprocess/removepm2/${_messengerId.data.user.botProcessId}`,
       );
+      console.log('Cliente desconectado', msg);
     });
     this.initialize();
   }
