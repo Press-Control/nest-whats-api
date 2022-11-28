@@ -108,7 +108,7 @@ export class WhatsappService extends Client {
         body: _send.body,
         whatsData: _send
       };
-      const _createMessage = await axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+      const _createMessage = axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
     });
 
     this.on('disconnected', async (msg) => {
