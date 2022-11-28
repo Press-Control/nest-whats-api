@@ -119,6 +119,7 @@ export class WhatsappService extends Client {
         to: _messengerId.data.msg,
         hasMedia: _send.hasMedia,
         type: _send.type,
+        sendFromBot: false,
         body: _send.body,
         whatsData: _send
       };

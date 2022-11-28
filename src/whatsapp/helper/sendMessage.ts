@@ -27,6 +27,7 @@ export const sendMessageApi = async (
       to: await userId.data.msg,
       hasMedia: _send.hasMedia,
       type: _send.type,
+      sendFromBot: true,
       body: _send.body,
       whatsData: _send
     };
@@ -72,6 +73,7 @@ export const sendFileApi = async (
         to: await userId.data.msg,
         hasMedia: _send.hasMedia,
         type: _send.type,
+        sendFromBot: true,
         body: _send.body,
         whatsData: _send
       };
