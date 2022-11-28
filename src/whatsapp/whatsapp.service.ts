@@ -83,14 +83,31 @@ export class WhatsappService extends Client {
     //   console.log(reaction);
     // });
 
-    this.on('message', (message) => {
+    this.on('message', async (message) => {
       // TODO: Guradar mensaje en la base de datos
       if (message.from === 'status@broadcast') {
         return;
       }
-
-      console.log(message.body);
-      console.log(message.from);
+      const _send = message;
+      console.log('---------------Message------------------');
+      console.log(message);
+      console.log('---------------Message------------------');
+      const userId = await axios.get(
+        `${process.env.MAIN_URL}/api/user/botmessage/${
+          _send.from.split('@')[0]
+        }`,
+      );
+      const messageDB = {
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        from: await userId.data.msg,
+        to: process.env.MESSENGERID,
+        hasMedia: _send.hasMedia,
+        type: _send.type,
+        body: _send.body,
+        whatsData: _send
+      };
+      const _createMessage = await axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
     });
 
     this.on('disconnected', async (msg) => {
@@ -105,7 +122,9 @@ export class WhatsappService extends Client {
     const message = messageTxtDto.message;
 
     const send = await sendMessageApi(this, phoneNumber, message);
+    console.log('--------------------------------SendMessageText----------------------------------');
     console.log(send['status']);
+    console.log('--------------------------------SendMessageText----------------------------------');
     return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
 

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import { validNumber } from './validNumber';
 
@@ -8,11 +9,29 @@ export const sendMessageApi = async (
 ) => {
   const _validNumber = await validNumber(client, number);
   if (_validNumber) {
-    const sendMessageTxt = await client.sendMessage(
+    const _send = await client.sendMessage(
       `521${number}@c.us`,
       message,
     );
-    console.log(sendMessageTxt);
+    console.log(_send);
+    // TODO: Gurdar mensaje en la base de datos
+    const userId = await axios.get(
+      `${process.env.MAIN_URL}/api/user/botmessage/${
+        _send.to.split('@')[0]
+      }`,
+    );
+    const messageDB = {
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      from: process.env.MESSENGERID,
+      to: await userId.data.msg,
+      hasMedia: _send.hasMedia,
+      type: _send.type,
+      body: _send.body,
+      whatsData: _send
+    };
+    const _createMessage = await axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+
     const respuesta = {
       ok: true,
       msg: 'Mensaje envido',
@@ -39,11 +58,29 @@ export const sendFileApi = async (
     const file = path;
     try {
       const media = MessageMedia.fromFilePath(file);
-      await client.sendMessage(`521${number}@c.us`, media);
-      console.log('Client send');
+      const _send = await client.sendMessage(`521${number}@c.us`, media);
+      console.log(_send);
+      const userId = await axios.get(
+        `${process.env.MAIN_URL}/api/user/botmessage/${
+          _send.to.split('@')[0]
+        }`,
+      );
+      const messageDB = {
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        from: process.env.MESSENGERID,
+        to: await userId.data.msg,
+        hasMedia: _send.hasMedia,
+        type: _send.type,
+        body: _send.body,
+        whatsData: _send
+      };
+      const _createMessage = await axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+      console.log(_createMessage);
+      console.log(messageDB);
       const respuesta = {
         ok: true,
-        msg: 'Mensaje envido',
+        msg: 'Mensaje enviado',
         status: 200,
       };
       return respuesta;
