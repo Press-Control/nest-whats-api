@@ -97,6 +97,7 @@ export class WhatsappService extends Client {
           _send.from.split('@')[0]
         }`,
       );
+      console.log(userId);
       const messageDB = {
         createdAt: Date.now(),
         updatedAt: Date.now(),
