@@ -152,9 +152,12 @@ export class WhatsappService extends Client {
         'MX',
       );
       const _myPhone = phoneUtil.getNationalSignificantNumber(_userPhone);
+      const _messengerId = await axios.get(
+        `${process.env.MAIN_URL}/api/messenger/${_myPhone}`,
+      );
       console.log('Cliente desconectado', msg);
       await axios.delete(
-        `${process.env.MAIN_URL}/api/botprocess/removepm2/${_myPhone}`,
+        `${process.env.MAIN_URL}/api/botprocess/removepm2/${_messengerId.data.msg}`,
       );
     });
     this.initialize();
