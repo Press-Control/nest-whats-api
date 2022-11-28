@@ -98,20 +98,33 @@ export class WhatsappService extends Client {
           _send.from.split('@')[0]
         }`,
       );
+
+      const _messengerId:AxiosResponse<MessengerCreateResponse> = await axios.get(
+        `${process.env.MAIN_URL}/api/messenger/${
+          _send.to.split('@')[0]
+        }`,
+      );
+
       console.log(userId);
+      console.log('----------------------------messengerid-----------------------------');
+      console.log(process.env.MESSENGERID);
+      console.log('----------------------------messengerid-----------------------------');
+      
       const messageDB = {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         from: userId.data.msg,
-        to: process.env.MESSENGERID,
+        to: _messengerId.data.msg,
         hasMedia: _send.hasMedia,
         type: _send.type,
         body: _send.body,
         whatsData: _send
       };
+      console.log('----------------------------messengerdbobject-----------------------------');
       console.log(messageDB);
+      console.log('----------------------------messengerdbobject-----------------------------');
       try {
-        const _createMessage = axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
+        const _createMessage = await axios.post(`${process.env.MAIN_URL}/api/message/`, messageDB)
       } catch (error) {
         console.log(error);
       }
