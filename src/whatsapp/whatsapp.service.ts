@@ -11,7 +11,7 @@ import { connectToServer } from './socket-client';
 import * as phone from 'google-libphonenumber';
 import * as fsPromise from 'fs/promises';
 
-interface MessengerCreateResponse {
+export interface MessengerCreateResponse {
   ok: boolean;
   msg: string;
 }

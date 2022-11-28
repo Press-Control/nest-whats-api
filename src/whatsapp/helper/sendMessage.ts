@@ -1,5 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Client, MessageMedia } from 'whatsapp-web.js';
+import { MessengerCreateResponse } from '../whatsapp.service';
 import { validNumber } from './validNumber';
 
 export const sendMessageApi = async (
@@ -20,10 +21,16 @@ export const sendMessageApi = async (
         _send.to.split('@')[0]
       }`,
     );
+
+    const _messengerId:AxiosResponse<MessengerCreateResponse> = await axios.get(
+      `${process.env.MAIN_URL}/api/messenger/${
+        _send.from.split('@')[0]
+      }`,
+    );
     const messageDB = {
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      from: process.env.MESSENGERID,
+      from: _messengerId.data.msg,
       to: await userId.data.msg,
       hasMedia: _send.hasMedia,
       type: _send.type,
@@ -66,10 +73,15 @@ export const sendFileApi = async (
           _send.to.split('@')[0]
         }`,
       );
+      const _messengerId:AxiosResponse<MessengerCreateResponse> = await axios.get(
+        `${process.env.MAIN_URL}/api/messenger/${
+          _send.from.split('@')[0]
+        }`,
+      );
       const messageDB = {
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        from: process.env.MESSENGERID,
+        from: _messengerId.data.msg,
         to: await userId.data.msg,
         hasMedia: _send.hasMedia,
         type: _send.type,
