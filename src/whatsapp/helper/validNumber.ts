@@ -2,7 +2,7 @@ import { Client } from 'whatsapp-web.js';
 
 export const validNumber = async (client: Client, phoneNumber: number) => {
   const is_valid_number = await client.isRegisteredUser(
-    phoneNumber.toString()
+    `521${phoneNumber.toString()}`
   );
   if (is_valid_number) {
     return true;
