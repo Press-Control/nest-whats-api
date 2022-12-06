@@ -1,5 +1,6 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import WAWebJS from 'whatsapp-web.js';
 
 export class MessageMediaDto {
   @ApiProperty({
@@ -22,4 +23,8 @@ export class MessageMediaDto {
   @MinLength(10)
   @MaxLength(10)
   phoneNumber: string;
+
+  @ApiProperty({})
+  @IsOptional()
+  caption?: string;
 }

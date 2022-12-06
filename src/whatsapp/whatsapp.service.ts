@@ -183,8 +183,9 @@ export class WhatsappService extends Client {
   async createMessageMedia(messageMediaDto: MessageMediaDto) {
     const phoneNumber = parseInt(messageMediaDto.phoneNumber);
     const path = messageMediaDto.path;
+    const caption = messageMediaDto.caption;
 
-    const send = await sendFileApi(this, phoneNumber, path);
+    const send = await sendFileApi(this, phoneNumber, path, caption);
     return { ok: send['ok'], msg: send['msg'], status: send['status'] };
   }
 

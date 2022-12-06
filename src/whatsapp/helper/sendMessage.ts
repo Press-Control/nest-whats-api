@@ -58,13 +58,14 @@ export const sendFileApi = async (
   client: Client,
   number: number,
   path: string,
+  caption: string,
 ) => {
   const _validNumber = await validNumber(client, number);
   if (_validNumber) {
     const file = path;
     try {
       const media = MessageMedia.fromFilePath(file);
-      const _send = await client.sendMessage(`521${number}@c.us`, media);
+      const _send = await client.sendMessage(`521${number}@c.us`, media, { caption: caption });
       console.log(_send);
       const userId = await axios.get(
         `${process.env.MAIN_URL}/api/user/botmessage/${
