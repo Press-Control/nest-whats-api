@@ -80,6 +80,7 @@ export class WhatsappService extends Client {
         );
         connectToServer();
       } catch (error) {
+        console.log('Error On Ready');
         console.log(error);
       }
     });
@@ -141,6 +142,7 @@ export class WhatsappService extends Client {
           messageDB,
         );
       } catch (error) {
+        console.log('Error On Message');
         console.log(error);
       }
     });
